@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Check the expiry date of your HTTPS certificates in your VPC. The function scans all available IP addresses and reports back the certificate expiry date per IP. 
+Resources:
+  sslcheckvpc:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda.handler
+      Runtime: python3.7
+      CodeUri: .
+      Description: ''
+      MemorySize: 3008
+      Timeout: 180
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 hour)
+      Environment:
+        Variables:
+          subnet: 172.31.0.0/16
+      Tracing: Active
+      ReservedConcurrentExecutions: 1
+      Policies:
+        - VPCAccessPolicy
+
