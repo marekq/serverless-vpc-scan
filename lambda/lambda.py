@@ -8,7 +8,8 @@ from OpenSSL import SSL
 from ssl import PROTOCOL_TLSv1
 from datetime import datetime
 
-q1  = queue.Queue()
+res     = []
+q1      = queue.Queue()
 
 # worker for queue jobs
 def worker():
@@ -29,8 +30,8 @@ def job(ip):
         get_cert(ip, '443')
     
     # if the connection fails or times out, keep on going
-    except:
-        pass
+    except Exception as e:
+        print('ERROR: '+e)
     
 # get the certificate
 def get_cert(host, port):
@@ -76,6 +77,7 @@ def get_cert(host, port):
 
     # print the expiry date in human readible format
     x   = str(host)+' - '+str(vdays)+' days until certificate expiry on '+vtill+' for '+viss
+    res.append(x)
     print(x)
 
     # TODO - publish the message to SNS if the functions has a NAT GW or VPC endpoint, or call to different Lambda function
