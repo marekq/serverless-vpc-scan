@@ -8,6 +8,7 @@ from OpenSSL import SSL
 from ssl import PROTOCOL_TLSv1
 from datetime import datetime
 
+# create a list for storing results and a queue
 res     = []
 q1      = queue.Queue()
 
@@ -85,9 +86,10 @@ def get_cert(host, port):
 
 # the lambda handler
 def handler(event, context):
-    # get all the ip addresses for the CIDR (the default is 172.16.0.0/16, which is typically the default VPC range)
+    # get all the ip addresses for the CIDR (the default is 172.16.0.0/16) and submit them to a local queue.
     check_subnet()
 
+    # launch 1000 threads and start scanning the hosts.
     for x in range(1000):
         t = threading.Thread(target = worker)
         t.daemon = True

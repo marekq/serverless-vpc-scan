@@ -15,7 +15,7 @@ dirp    = dirn+'python/'
 dirl    = dirn+'layer.zip'
 
 # set a path for the layer zip destination
-dirg    = "/Users/marek/Documents/GitHub/serverless-vpc-scan/layer"
+dirg    = os.getcwd()+"/layer"
 
 print('creating '+dirp)
 os.makedirs(dirp)
