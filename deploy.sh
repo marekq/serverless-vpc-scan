@@ -5,8 +5,13 @@
 RED='\033[0;31m'
 NC='\033[0m'
 
+'''
+# REBUILD THE LAMBDA LAYER - commented by default
+
 echo -e "\n${RED} * Building the Lambda layer... ${NC}\n"
 python3 build_layer.py
+
+'''
 
 echo -e "\n${RED} * Running SAM validate locally to test function... ${NC}\n"
 sam validate

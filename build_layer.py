@@ -2,7 +2,7 @@
 # @marekq
 # www.marek.rocks
 
-import boto3, os, subprocess, sys, time
+import boto3, os, shutil, subprocess, sys, time
 lambd   = boto3.client('lambda')
 
 # make a temporary workdir in /tmp
@@ -17,6 +17,7 @@ dirl    = dirn+'layer.zip'
 # set a path for the layer zip destination
 dirg    = os.getcwd()+"/layer"
 
+# creating python dir in '/tmp'
 print('creating '+dirp)
 os.makedirs(dirp)
 
@@ -28,8 +29,31 @@ for lib in fn:
 
 # create a zip file with the layer
 os.chdir(dirn)
-subprocess.call(["zip", "-r9", dirl, "./python"])
-subprocess.call(["cp", dirl, "/tmp/layer.zip"])
-subprocess.call(["cp", dirl, dirg])
 
+# zip the contents of the pip folders
+subprocess.call(["zip", "-r9", dirl, "./python"])
+
+# copy zip for debug to '/tmp'
+subprocess.call(["cp", dirl, "/tmp/layer.zip"])
+
+# delete the local layer dir
+shutil.rmtree(dirg) 
+
+# creating the local dir again
+os.makedirs(dirg)
+
+# copy zip to the local layer dir
+subprocess.call(["cp", dirl, dirg])
 print("created layer zip in "+dirn+" and "+dirl)
+
+# unzip the zip in the local layer dir
+os.chdir(dirg)
+subprocess.call(["unzip", "layer.zip"])
+print("unzipped zip file in "+dirg)
+
+# cleanup /tmp files
+os.remove(dirg+"/layer.zip")
+shutil.rmtree(dirn) 
+print("deleted "+dirn)
+
+print("DONE")
