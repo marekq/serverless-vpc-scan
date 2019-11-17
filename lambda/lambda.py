@@ -2,7 +2,7 @@
 # @marekq
 # www.marek.rocks
 
-import boto3, os, queue, socket, threading
+import os, queue, socket, threading
 from ipaddress import *
 from OpenSSL import SSL
 from ssl import PROTOCOL_TLSv1
@@ -10,6 +10,7 @@ from datetime import datetime
 
 # create a list for storing results and a queue
 res     = []
+err     = []
 q1      = queue.Queue()
 
 # worker for queue jobs
@@ -21,24 +22,26 @@ def worker():
 def check_subnet():
     cidr   = os.environ['subnet']
     
-    ips     = list(ip_network(cidr).hosts())
+    ips    = list(ip_network(cidr).hosts())
     for x in ips:
 	    q1.put(str(x))
 
 def job(ip):
     # try to retrieve the certificate by connecting to the host
     try:
-        get_cert(ip, '443')
-    
+        x   = get_cert(ip, '443')
+        print(x)
+
     # if the connection fails or times out, keep on going
     except Exception as e:
-        print('ERROR: '+e)
+        err.append(ip)
+        #print('ERROR: IP '+str(ip)+'   '+str(e))
     
 # get the certificate
 def get_cert(host, port):
-    # open the socket with a timeout of 3
+    # open the socket with a timeout of 5
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(3)
+    sock.settimeout(5)
 
     # set the protocol to TLSv1 and remove the timeout
     osobj = SSL.Context(PROTOCOL_TLSv1)
@@ -79,7 +82,7 @@ def get_cert(host, port):
     # print the expiry date in human readible format
     x   = str(host)+' - '+str(vdays)+' days until certificate expiry on '+vtill+' for '+viss
     res.append(x)
-    print(x)
+    return x
 
     # TODO - publish the message to SNS if the functions has a NAT GW or VPC endpoint, or call to different Lambda function
     #sns.publish(TopicArn = 'arn:aws:sns:eu-west-1:123:abc', Message = x)
@@ -89,9 +92,12 @@ def handler(event, context):
     # get all the ip addresses for the CIDR (the default is 172.16.0.0/16) and submit them to a local queue.
     check_subnet()
 
-    # launch 1000 threads and start scanning the hosts.
+    # launch 100 threads and start scanning the hosts.
     for x in range(1000):
         t = threading.Thread(target = worker)
         t.daemon = True
         t.start()
     q1.join()
+
+    print(str(len(res))+' results')
+    print(str(len(err))+' errors')

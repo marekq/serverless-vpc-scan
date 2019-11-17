@@ -7,10 +7,10 @@ Resources:
     Properties:
       Handler: lambda.handler
       Runtime: python3.7
-      CodeUri: ./lambda
+      CodeUri: lambda/
       Description: ''
       MemorySize: 3008
-      Timeout: 120
+      Timeout: 60
       Events:
         Schedule1:
           Type: Schedule
@@ -18,7 +18,7 @@ Resources:
             Schedule: rate(1 hour)
       Environment:
         Variables:
-          subnet: 172.31.0.0/16
+          subnet: 172.31.37.0/24
       Tracing: Active
       ReservedConcurrentExecutions: 1
       Policies:
@@ -29,10 +29,10 @@ Resources:
   LibLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: OpenSSLandIP
+      LayerName: PyOpenSSL-IPaddress-sslyze
       Description: Dependencies for OpenSSL, sslyze and ipaddress.
       ContentUri: layer/
       CompatibleRuntimes:
         - python3.7
-      LicenseInfo: 'MIT'
+      LicenseInfo: ''
       RetentionPolicy: Delete
