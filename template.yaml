@@ -1,13 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Check the expiry date of your HTTPS certificates in your VPC. 
+
 Resources:
+
   sslcheckvpc:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: lambda.handler
       Runtime: python3.7
-      CodeUri: lambda/
+      CodeUri: lambda-scan/
       Description: ''
       MemorySize: 3008
       Timeout: 60
@@ -25,6 +27,16 @@ Resources:
         - AWSLambdaVPCAccessExecutionRole
       Layers: 
         - !Ref LibLayer
+
+  configlambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda.handler
+      Runtime: python3.7
+      CodeUri: lambda-config/
+      Description: ''
+      MemorySize: 128
+      Timeout: 10
 
   LibLayer:
     Type: AWS::Serverless::LayerVersion

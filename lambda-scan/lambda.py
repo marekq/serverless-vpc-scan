@@ -92,7 +92,7 @@ def handler(event, context):
     # get all the ip addresses for the CIDR (the default is 172.16.0.0/16) and submit them to a local queue.
     check_subnet()
 
-    # launch 100 threads and start scanning the hosts.
+    # launch 1000 threads and start scanning the hosts.
     for x in range(1000):
         t = threading.Thread(target = worker)
         t.daemon = True

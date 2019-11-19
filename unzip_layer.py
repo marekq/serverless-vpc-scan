@@ -10,7 +10,12 @@ dirp    = dirg+"python/"
 
 # unzip the zip in the local layer dir
 os.chdir(dirg)
-shutil.rmtree(dirp) 
+try:   
+    shutil.rmtree(dirp)
+    print('deleted dir '+dirp) 
+except:
+    print('skipped deleting '+dirp)
+
 subprocess.call(["unzip", "layer.zip"])
 print("unzipped zip file in "+dirg)
 
